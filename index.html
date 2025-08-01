@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Bot - Fortune OX</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #FFD700;
+        }
+        .btn {
+            background: linear-gradient(45deg, #FF6B35, #F7931E);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+        .success {
+            border-left: 4px solid #4CAF50;
+        }
+        .error {
+            border-left: 4px solid #f44336;
+        }
+        .info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #FFD700;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎰 Bot de Análise RTP - 81bet40</h1>
+        
+        <div class="info">
+            <strong>ℹ️ Como funciona:</strong><br>
+            Este bot analisa jogos com RTP alto e envia mensagens dinâmicas para o Telegram.
+            Cada mensagem inclui: nome do jogo, RTP real, sinal calculado e link direto para a plataforma.
+        </div>
+
+        <button class="btn" onclick="enviarMensagem()">
+            🚀 Enviar Mensagem para Telegram
+        </button>
+
+        <button class="btn" onclick="testarBot()">
+            🧪 Testar Bot (Trigger)
+        </button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Enviando mensagem...</p>
+        </div>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        async function enviarMensagem() {
+            const btn = event.target;
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            
+            btn.disabled = true;
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            
+            try {
+                const response = await fetch('/.netlify/functions/send-telegram', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                result.className = 'result ' + (data.success ? 'success' : 'error');
+                result.innerHTML = `
+                    <strong>${data.success ? '✅ Sucesso!' : '❌ Erro!'}</strong><br>
+                    ${data.message}<br>
+                    ${data.jogoEnviado ? `<strong>🎮 Jogo:</strong> ${data.jogoEnviado.nome} (RTP: ${data.jogoEnviado.rtp})<br>` : ''}
+                    <small>Timestamp: ${new Date().toLocaleString('pt-BR')}</small>
+                `;
+                result.style.display = 'block';
+                
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `
+                    <strong>❌ Erro de conexão!</strong><br>
+                    ${error.message}
+                `;
+                result.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        async function testarBot() {
+            const btn = event.target;
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            
+            btn.disabled = true;
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            
+            try {
+                const response = await fetch('/.netlify/functions/trigger-bot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                result.className = 'result ' + (data.success ? 'success' : 'error');
+                result.innerHTML = `
+                    <strong>${data.success ? '✅ Bot acionado!' : '❌ Erro!'}</strong><br>
+                    ${data.message}<br>
+                    <small>Timestamp: ${data.timestamp}</small>
+                `;
+                result.style.display = 'block';
+                
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `
+                    <strong>❌ Erro de conexão!</strong><br>
+                    ${error.message}
+                `;
+                result.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
+

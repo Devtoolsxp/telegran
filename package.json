@@ -1,0 +1,17 @@
+{
+  "name": "telegram-bot-netlify",
+  "version": "1.0.0",
+  "description": "Bot para enviar mensagens dinâmicas para Telegram via Netlify Functions",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo 'Build complete'",
+    "dev": "netlify dev"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}
+
